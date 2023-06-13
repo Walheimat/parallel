@@ -1,0 +1,8 @@
+# Build fragments
+.cask/
+dist/
+coverage
+*.elc
+
+# Development
+bydi-tasks.org
