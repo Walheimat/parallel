@@ -1,0 +1,90 @@
+* parallel
+
+#+BEGIN_HTML
+<a href='https://coveralls.io/github/Walheimat/parallel?branch=trunk'>
+    <img
+        src='https://coveralls.io/repos/github/Walheimat/parallel/badge.svg?branch=trunk'
+        alt='Coverage Status'
+    />
+</a>
+#+END_HTML
+
+
+=parallel= allows you to create a command comprising two commands.
+The first function, the default, consumes normal prefix arguments,
+the second requires a numeric argument to activate and consumes
+numeric prefix arguments.
+
+It grew out of my [[https://github.com/Walheimat/wal-emacs][configuration]] and therefore is currently still
+heavily geared towards my usage.
+
+** Installation
+
+If you use =straight= or =quelpa=, you know what to do.
+
+If you're on Emacs >29, I recommend using =package-vc-install=.
+
+Alternatively, provided you have Cask, you can install the package
+with =make package-install=.
+
+** Usage
+
+Say you have two related commands but too many key-bindings already.
+You also want those two commands do consume prefix arguments.
+
+#+begin_src emacs-lisp
+(require 'parallel)
+
+(defun say-yes (&optional no)
+  "Say 'yes', unless NO is t, then say 'no'."
+  (interactive "P")
+
+  (if no
+      (message "no")
+    (message "yes")))
+
+(defun say-hello (&optional goodbye)
+  "Say 'hello', unless GOODBYE is t, then say 'goodbye'."
+  (interactive "P")
+
+  (if goodbye
+      (message "goodbye")
+    (message "hello")))
+
+(parallel say-yes say-hello)
+#+end_src
+
+This will create a new command =say-yes||say-hello=. Let's take a look
+at the docstring:
+
+#+begin_src emacs-lisp
+;; Call `say-yes' or `say-hello' depending on prefix argument.
+
+;; No argument means: call the prior. Numeric prefix 0 means: call the latter.
+
+;; For all other prefix values: numeric prefixes call the latter,
+;; `universal-argument' prefixes call the prior.
+#+end_src
+
+If you bind this command now, it will cal =say-yes=. If you call it with
+the =universal-argument=, it will say "no".
+
+If you want to call =say-goodbye=, you need to call the new command with
+a numeric prefix argument. So =C-u 0= will call =say-goodbye= normally, no
+prefix argument, all other numeric prefix arguments will be passed.
+
+If you need your second command to sometimes behave like a normal
+command because it uses the prefix argument to branch, you can pass
+the key =:universalize t=.
+
+#+begin_src emacs-lisp
+(parallel say-yes say-hello :universalize t)
+#+end_src
+
+This means that a =C-u 4= for example will result in prefix argument
+='(4)= like a normal =C-u= would.
+
+** Configuration
+
+You can configure the separator used to construct the new command
+name. The default is the string =||=.
