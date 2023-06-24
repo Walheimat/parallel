@@ -9,7 +9,6 @@
 </a>
 #+END_HTML
 
-
 =parallel= allows you to create a command comprising two commands.
 The first function, the default, consumes normal prefix arguments,
 the second requires a numeric argument to activate and consumes
