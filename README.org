@@ -65,16 +65,20 @@ at the docstring:
 ;; `universal-argument' prefixes call the prior.
 #+end_src
 
-If you bind this command now, it will cal =say-yes=. If you call it with
-the =universal-argument=, it will say "no".
+If you bind this command now, it will call =say-yes= and call
+=message= with "yes". If you call it with the =universal-argument=, it
+will branch as expected and call =message= with "no".
 
-If you want to call =say-goodbye=, you need to call the new command with
-a numeric prefix argument. So =C-u 0= will call =say-goodbye= normally, no
-prefix argument, all other numeric prefix arguments will be passed.
+If you want to call =say-hello=, you need to call the new command with
+a numeric prefix argument. =C-u 0= will call =say-hello= normally as
+if no prefix argument had been provided, and will call =message= with
+"hello"; all other numeric prefix arguments will be passed and
+therefore the function will call =message= with "goodbye= for =C-u 1=,
+for example.
 
 If you need your second command to sometimes behave like a normal
-command because it uses the prefix argument to branch, you can pass
-the key =:universalize t=.
+command because it uses the prefix argument to branch (take a look at
+=org-refile= for example), you can pass the key =:universalize t=.
 
 #+begin_src emacs-lisp
 (parallel say-yes say-hello :universalize t)
