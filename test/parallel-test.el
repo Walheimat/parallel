@@ -74,6 +74,11 @@
       (t
        (call-interactively 'some-fun))))))
 
+(ert-deftest parallel--name--truncates ()
+  (let ((parallel-custom-namespace "test-"))
+
+    (should (string= "helper" (parallel--name 'test-helper)))))
+
 (ert-deftest parallel--public ()
   (bydi-match-expansion
    (parallel some-fun other-fun :universalize t)

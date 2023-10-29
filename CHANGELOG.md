@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Variable `parallel-naming-function` that defaults to
   `parallel--normalize` this is a new function that will not repeat a
   prefix common to both functions.
+- Variable `parallel-custom-namespace` that can be set to a string
+  used in your own function definitions (think `my/`). Allows
+  normalization to work for library and custom functions.
 
 ### Changed
 

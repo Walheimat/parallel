@@ -30,7 +30,21 @@
   :type '(choice (const :tag "Normalize" parallel--normalize)
                  (const :tag "Concatenate" parallel--concatenate)))
 
+(defcustom parallel-custom-namespace nil
+  "The namespace used when defining your own functions.
+
+If this is set, the custom namespace prefix is ignored."
+  :group 'parallel
+  :type 'string)
+
 ;;; -- Naming
+
+(defun parallel--maybe-truncate-custom-namespace (str)
+  "If STR is prefixed by the custom namespace, truncate left."
+  (if (and parallel-custom-namespace
+           (string-prefix-p parallel-custom-namespace str))
+      (string-trim str parallel-custom-namespace)
+    str))
 
 (defun parallel--common-prefix (s1 s2)
   "Return the common prefix for S1 and S2."
@@ -56,14 +70,19 @@
 
     index))
 
+(defun parallel--name (fun)
+  "Get the name of FUN."
+  (parallel--maybe-truncate-custom-namespace
+   (symbol-name fun)))
+
 (defun parallel--normalize (a b)
   "Normalize functions A and B.
 
 This will make sure that prefixes used for both functions aren't
 repeated. If the functions don't share a prefix, this defers to
 `partial-recall--concatenate'."
-  (let* ((name-a (symbol-name a))
-         (name-b (symbol-name b))
+  (let* ((name-a (parallel--name a))
+         (name-b (parallel--name b))
          (prefix (parallel--common-prefix name-a name-b)))
 
     (if (> prefix 0)
@@ -72,7 +91,7 @@ repeated. If the functions don't share a prefix, this defers to
 
 (defun parallel--concatenate (a b)
   "Concatenate functions A and B."
-  (intern (concat (symbol-name a) parallel-separator (symbol-name b))))
+  (intern (concat (parallel--name a) parallel-separator (parallel--name b))))
 
 ;;; -- Core
 
