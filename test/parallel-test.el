@@ -10,7 +10,7 @@
 
 (ert-deftest parallel ()
   (bydi-match-expansion
-   (parallel some-fun other-fun)
+   (parallel--parallelize some-fun other-fun)
    '(defun some-fun||other-fun (&optional arg)
      "Call `some-fun' or `other-fun' depending on prefix argument.\nNo argument means: call the prior. Numeric prefix `0' means: call the latter.\n\nFor all other prefix values: numeric prefixes call the latter,\n`universal-argument' prefixes call the prior."
      (interactive "P")
@@ -30,7 +30,7 @@
 
 (ert-deftest parallel--universalized ()
   (bydi-match-expansion
-   (parallel some-fun other-fun :universalize t)
+   (parallel--parallelize some-fun other-fun :universalize t)
    '(defun some-fun||other-fun (&optional arg)
      "Call `some-fun' or `other-fun' depending on prefix argument.\nNo argument means: call the prior. Numeric prefix `0' means: call the latter.\n\nFor all other prefix values: numeric prefixes call the latter,\n`universal-argument' prefixes call the prior.\n\nThis function is universalized."
      (interactive "P")
@@ -51,6 +51,12 @@
          (call-interactively 'other-fun)))
       (t
        (call-interactively 'some-fun))))))
+
+(ert-deftest parallel--public ()
+  (bydi-match-expansion
+   (parallel some-fun other-fun :universalize t)
+   '(progn
+     (parallel--parallelize some-fun other-fun :universalize t))))
 
 
 ;;; parallel-test.el ends here

@@ -18,13 +18,16 @@
 
 (require 'cl-lib)
 
+;;; -- Customization
+
 (defcustom parallel--separator "||"
   "Separator between the two `parallel' function names."
   :group 'parallel
   :type 'string)
 
-;;;###autoload
-(cl-defmacro parallel (a b &key universalize)
+;;; -- Private
+
+(cl-defmacro parallel--parallelize (a b &key universalize)
   "Define a function composing A and B.
 
 Both functions are called interactively.
@@ -68,6 +71,22 @@ If UNIVERSALIZE is t, the prefix argument is set to mimic the
                (call-interactively ',b))))
         (t
          (call-interactively ',a))))))
+
+;;; -- API
+
+;;;###autoload
+(cl-defmacro parallel (a b &rest args)
+  "Define a function composing A and B.
+
+Both functions are called interactively.
+
+By default, A is called. B will be called if the prefix argument
+is numeric. This allows both commands to consume the prefix.
+
+See `parallel--parallelize' for the options in ARGS."
+  (declare (indent defun))
+  `(progn
+     (parallel--parallelize ,a ,b ,@args)))
 
 (provide 'parallel)
 
