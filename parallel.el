@@ -13,19 +13,68 @@
 ;; the second requires a numeric argument to activate and consumes
 ;; numeric prefix arguments.
 
-
 ;;; Code:
 
 (require 'cl-lib)
 
 ;;; -- Customization
 
-(defcustom parallel--separator "||"
+(defcustom parallel-separator "||"
   "Separator between the two `parallel' function names."
   :group 'parallel
   :type 'string)
 
-;;; -- Private
+(defcustom parallel-naming-function 'parallel--normalize
+  "The naming function to use."
+  :group 'parallel
+  :type '(choice (const :tag "Normalize" parallel--normalize)
+                 (const :tag "Concatenate" parallel--concatenate)))
+
+;;; -- Naming
+
+(defun parallel--common-prefix (s1 s2)
+  "Return the common prefix for S1 and S2."
+  (let ((index 0)
+        (s1-length (length s1))
+        (s2-length (length s2)))
+
+    (while (and (< index s1-length)
+                (< index s2-length)
+                (eq (aref s1 index)
+                    (aref s2 index)))
+      (setq index (1+ index)))
+
+    (when (or (eq index s1-length)
+              (eq index s2-length))
+      (setq index (1- index))
+
+      (while (and (> index 0)
+                  (not (eq ?- (aref s1 index))))
+        (setq index (1- index)))
+
+      (setq index (1+ index)))
+
+    index))
+
+(defun parallel--normalize (a b)
+  "Normalize functions A and B.
+
+This will make sure that prefixes used for both functions aren't
+repeated. If the functions don't share a prefix, this defers to
+`partial-recall--concatenate'."
+  (let* ((name-a (symbol-name a))
+         (name-b (symbol-name b))
+         (prefix (parallel--common-prefix name-a name-b)))
+
+    (if (> prefix 0)
+        (intern (concat name-a parallel-separator (substring name-b prefix)))
+      (parallel--concatenate a b))))
+
+(defun parallel--concatenate (a b)
+  "Concatenate functions A and B."
+  (intern (concat (symbol-name a) parallel-separator (symbol-name b))))
+
+;;; -- Core
 
 (cl-defmacro parallel--parallelize (a b &key universalize)
   "Define a function composing A and B.
@@ -42,7 +91,7 @@ If UNIVERSALIZE is t, the prefix argument is set to mimic the
   (let ((a-name (symbol-name a))
         (b-name (symbol-name b)))
 
-    `(defun ,(intern (concat a-name parallel--separator b-name)) (&optional arg)
+    `(defun ,(funcall parallel-naming-function a b) (&optional arg)
        ,(concat (format "Call `%s' or `%s' depending on prefix argument."
                         a-name
                         b-name)

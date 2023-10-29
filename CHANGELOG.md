@@ -10,12 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - A README.
+- Variable `parallel-naming-function` that defaults to
+  `parallel--normalize` this is a new function that will not repeat a
+  prefix common to both functions.
 
 ### Changed
 
 - Macro `parallel` is now a public version of internal macro
   `parallel--parallelize` to ensure the signature may remain the same
   while the underlying implementation changes.
+- Custom variable for the separator was renamed from
+  `parallel--separator` to `parallel-separator`.
 
 ## [v0.1.0]
 
