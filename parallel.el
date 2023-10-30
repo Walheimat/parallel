@@ -95,7 +95,7 @@ repeated. If the functions don't share a prefix, this defers to
 
 ;;; -- Core
 
-(cl-defmacro parallel--parallelize (a b &key universalize)
+(cl-defmacro parallel--parallelize (a b &key universalize name)
   "Define a function composing A and B.
 
 Both functions are called interactively.
@@ -104,13 +104,16 @@ By default, A is called. B will be called if the prefix argument
 is numeric. This allows both commands to consume the prefix.
 
 If UNIVERSALIZE is t, the prefix argument is set to mimic the
-`universal-argument' for B."
+`universal-argument' for B.
+
+NAME can be a symbol to use for defining the function if you
+don't want it to be automatically named."
   (declare (indent defun))
 
   (let ((a-name (symbol-name a))
         (b-name (symbol-name b)))
 
-    `(defun ,(funcall parallel-naming-function a b) (&optional arg)
+    `(defun ,(or name (funcall parallel-naming-function a b)) (&optional arg)
        ,(concat (format "Call `%s' or `%s' depending on prefix argument."
                         a-name
                         b-name)

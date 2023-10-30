@@ -28,6 +28,26 @@
       (t
        (call-interactively 'some-fun))))))
 
+(ert-deftest parallel--names ()
+  (bydi-match-expansion
+   (parallel--parallelize some-fun some-other-fun :name given-name-fun)
+   '(defun given-name-fun (&optional arg)
+      "Call `some-fun' or `some-other-fun' depending on prefix argument.\nNo argument means: call the prior. Numeric prefix `0' means: call the latter.\n\nFor all other prefix values: numeric prefixes call the latter,\n`universal-argument' prefixes call the prior."
+      (interactive "P")
+      (cond
+       ((not arg)
+        (call-interactively 'some-fun))
+       ((equal 0 arg)
+        (setq current-prefix-arg nil)
+        (prefix-command-update)
+        (call-interactively 'some-other-fun))
+       ((equal
+         (prefix-numeric-value arg)
+         arg)
+        (call-interactively 'some-other-fun))
+       (t
+        (call-interactively 'some-fun))))))
+
 (ert-deftest parallel--normalizes ()
   (let ((parallel-naming-function 'parallel--normalize))
 

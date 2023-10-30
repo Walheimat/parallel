@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Variable `parallel-custom-namespace` that can be set to a string
   used in your own function definitions (think `my/`). Allows
   normalization to work for library and custom functions.
+- Key `:name` can now be passed to `parallel` to explicitly set a
+  name.
 
 ### Changed
 
