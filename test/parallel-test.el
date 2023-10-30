@@ -79,6 +79,12 @@
 
     (should (string= "helper" (parallel--name 'test-helper)))))
 
+(ert-deftest parallel--normalize--no-empty-b ()
+  (let ((parallel-separator "||"))
+
+    (should (eq 'test-helper-friend||helper
+                (parallel--normalize 'test-helper-friend 'test-helper)))))
+
 (ert-deftest parallel--public ()
   (bydi-match-expansion
    (parallel some-fun other-fun :universalize t)
