@@ -53,8 +53,8 @@ You also want those two commands do consume prefix arguments.
 (parallel say-yes say-hello)
 #+end_src
 
-This will create a new command =say-yes||say-hello=. Let's take a look
-at the docstring:
+This will create a new command =say-yes||hello=. Let's take a look at
+the docstring:
 
 #+begin_src emacs-lisp
 ;; Call `say-yes' or `say-hello' depending on prefix argument.
@@ -89,5 +89,28 @@ This means that a =C-u 4= for example will result in prefix argument
 
 ** Configuration
 
-You can configure the separator used to construct the new command
-name. The default is the string =||=.
+You can configure the separator used to construct the new command name
+by setting =parallel-separator=. The default is the string ="||"=.
+
+If you want to avoid automatic normalizing you can set
+=parallel-naming-function= to =parallel--concatenate= or your own
+function accepting the two function symbols to return a new symbol.
+
+#+begin_src emacs-lisp
+(setq parallel-naming-function 'parallel--concatenate)
+
+(parallel say-yes say-hello) ;; Now creates command `say-yes||say-hello'.
+#+end_src
+
+If you have a custom namespace for your functions, say =my/=, you can
+set =parallel-custom-namespace= to ="my/"= to ensure normalizing
+works.
+
+#+begin_src emacs-lisp
+
+(parallel my/say-hello say-yes) ;; Would yield `my/say-hello||say-yes'.
+
+(setq parallel-custom-namespace "my/")
+
+(parallel my/say-hello say-yes) ;; Now yields expected `say-hello||say-yes'.
+#+end_src
