@@ -105,12 +105,32 @@
     (should (eq 'test-helper-friend||helper
                 (parallel--normalize 'test-helper-friend 'test-helper)))))
 
+;;; -- Mirroring.
+
+(ert-deftest parallel-mirror--boolean ()
+  (defun mirror-test (a b)
+    "Tests A and B."
+    (equal a b))
+
+  (bydi-match-expansion
+   (parallel-mirror--mirror mirror-test :type boolean)
+   '(defun parallel-mirror-mirror-test (a b)
+      "Inverts function `mirror-test'."
+      (not (mirror-test a b)))))
+
+;;; -- API
+
 (ert-deftest parallel--public ()
   (bydi-match-expansion
    (parallel some-fun other-fun :universalize t)
    '(progn
-     (parallel--parallelize some-fun other-fun :universalize t))))
+      (parallel--parallelize some-fun other-fun :universalize t))))
 
+(ert-deftest parallel-mirror--public ()
+  (bydi-match-expansion
+   (parallel-mirror some-fun :boolean t)
+   '(progn
+      (parallel-mirror--mirror some-fun :boolean t))))
 
 ;;; parallel-test.el ends here
 

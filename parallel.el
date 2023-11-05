@@ -143,6 +143,29 @@ don't want it to be automatically named."
         (t
          (call-interactively ',a))))))
 
+;; TODO: Cover more cases and make safer.
+(cl-defmacro parallel-mirror--mirror (a &key type)
+  "Mirror function A.
+
+TYPE is the way mirroring should be done. Currently this needs to
+be `boolean' to invert."
+  (pcase type
+    ('boolean
+     (let* ((arg-count (car-safe (func-arity a)))
+            (inc 96)
+            (args nil))
+
+       (when (> arg-count 0)
+         (dotimes (_i arg-count)
+           (setq inc (1+ inc))
+           (push (intern (char-to-string inc)) args)))
+
+       (setq args (reverse args))
+
+       `(defun ,(intern (format "parallel-mirror-%s" a)) (,@args)
+          ,(format "Inverts function `%s'." a)
+          (not (,a ,@args)))))))
+
 ;;; -- API
 
 ;;;###autoload
@@ -158,6 +181,15 @@ See `parallel--parallelize' for the options in ARGS."
   (declare (indent defun))
   `(progn
      (parallel--parallelize ,a ,b ,@args)))
+
+;;;###autoload
+(cl-defmacro parallel-mirror (a &rest args)
+  "Mirror function A by reversing what it does.
+
+See `parallel-mirror--mirror' for the options in ARGS."
+  (declare (indent defun))
+  `(progn
+     (parallel-mirror--mirror ,a ,@args)))
 
 (provide 'parallel)
 
