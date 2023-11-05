@@ -143,7 +143,62 @@ don't want it to be automatically named."
         (t
          (call-interactively ',a))))))
 
-;; TODO: Cover more cases and make safer.
+;; TODO: It might be easier just to check if it accepts any args and
+;;       then use `apply'.
+(defun parallel-mirror--derive-signature (a)
+  "Derive signature and arguments for A."
+  (let* ((arity (func-arity a))
+         (min (car-safe arity))
+         (max (cdr-safe arity))
+
+         (inc 96)
+         (get-arg-name (lambda () (setq inc (1+ inc)) (intern (char-to-string inc))))
+         (args)
+         (sig))
+
+    (cond
+     ((and (eq min max)
+           (> min 0))
+
+      (dotimes (_ min)
+        (push (funcall get-arg-name) args))
+
+      (setq args (reverse args)
+            sig args))
+
+     ((and (numberp max)
+           (> max min))
+
+      (let ((required nil)
+            (optional nil))
+
+        (dotimes (_ min)
+          (let ((new-arg (funcall get-arg-name)))
+            (push new-arg required)
+            (push new-arg args)))
+
+        (setq required (reverse required))
+
+        (dotimes (_ (- max min))
+          (let ((new-arg (funcall get-arg-name)))
+            (push new-arg optional)
+            (push new-arg args)))
+
+        (setq optional (reverse optional))
+
+        (setq args (reverse args))
+        (setq sig `(,@required &optional ,@optional))))
+
+     ((equal max 'many)
+
+      (dotimes (_ min)
+        (push (funcall get-arg-name) args))
+
+      (setq sig `(,@(reverse args) &rest r)
+            args `(,@args r))))
+
+    (cons sig args)))
+
 (cl-defmacro parallel-mirror--mirror (a &key type)
   "Mirror function A.
 
@@ -151,20 +206,11 @@ TYPE is the way mirroring should be done. Currently this needs to
 be `boolean' to invert."
   (pcase type
     ('boolean
-     (let* ((arg-count (car-safe (func-arity a)))
-            (inc 96)
-            (args nil))
+     (let ((args (parallel-mirror--derive-signature a)))
 
-       (when (> arg-count 0)
-         (dotimes (_i arg-count)
-           (setq inc (1+ inc))
-           (push (intern (char-to-string inc)) args)))
-
-       (setq args (reverse args))
-
-       `(defun ,(intern (format "parallel-mirror-%s" a)) (,@args)
+       `(defun ,(intern (format "parallel-mirror-%s" a)) (,@(car args))
           ,(format "Inverts function `%s'." a)
-          (not (,a ,@args)))))))
+          (not (,a ,@(cdr args))))))))
 
 ;;; -- API
 

@@ -108,6 +108,16 @@
 ;;; -- Mirroring.
 
 (ert-deftest parallel-mirror--boolean ()
+  (defun mirror-test-flat ()
+    "Tests nothing."
+    t)
+
+  (bydi-match-expansion
+   (parallel-mirror--mirror mirror-test-flat :type boolean)
+   '(defun parallel-mirror-mirror-test-flat ()
+      "Inverts function `mirror-test-flat'."
+      (not (mirror-test-flat))))
+
   (defun mirror-test (a b)
     "Tests A and B."
     (equal a b))
@@ -116,7 +126,29 @@
    (parallel-mirror--mirror mirror-test :type boolean)
    '(defun parallel-mirror-mirror-test (a b)
       "Inverts function `mirror-test'."
-      (not (mirror-test a b)))))
+      (not (mirror-test a b))))
+
+  (defun mirror-test-optional (a b &optional c)
+    "Test A and B and optionally B."
+    (or c
+        (equal a b)))
+
+  (bydi-match-expansion
+   (parallel-mirror--mirror mirror-test-optional :type boolean)
+   '(defun parallel-mirror-mirror-test-optional (a b &optional c)
+      "Inverts function `mirror-test-optional'."
+      (not (mirror-test-optional a b c))))
+
+  (defun mirror-test-many (a &optional b &rest c)
+    "Test A and B and optionally B."
+    (or c
+        (equal a b)))
+
+  (bydi-match-expansion
+   (parallel-mirror--mirror mirror-test-many :type boolean)
+   '(defun parallel-mirror-mirror-test-many (a &rest r)
+      "Inverts function `mirror-test-many'."
+      (not (mirror-test-many a r)))))
 
 ;;; -- API
 
