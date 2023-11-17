@@ -160,9 +160,9 @@
 
 (ert-deftest parallel-mirror--public ()
   (bydi-match-expansion
-   (parallel-mirror some-fun :boolean t)
+   (parallel-mirror some-fun :type boolean)
    '(progn
-      (parallel-mirror--mirror some-fun :boolean t))))
+      (parallel-mirror--mirror some-fun :type boolean))))
 
 ;;; parallel-test.el ends here
 
