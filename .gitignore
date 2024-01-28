@@ -5,3 +5,4 @@ coverage
 dist/
 parallel-autoloads.el
 parallel-pkg.el
+node_modules/
