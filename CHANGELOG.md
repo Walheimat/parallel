@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Walheimat/parallel/compare/v0.3.0...v0.3.1) (2024-01-28)
+
+
+### Features
+
+* **ci:** add semantic-release ([cf04b50](https://github.com/Walheimat/parallel/commit/cf04b50d4a99664821bd1be03174138a72b66b68))
+
 ## [0.3.0]
 
 ### Added

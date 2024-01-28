@@ -7,6 +7,6 @@
  (depends-on "undercover")
  (depends-on "compat"))
 
-(package "parallel" "0.3.0" "Parallel commands")
+(package "parallel" "0.3.1" "Parallel commands")
 
 (package-file "parallel.el")
